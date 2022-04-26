@@ -4,6 +4,14 @@ import './style.css'
 import { stopwatchStorageHandler } from "../../storageHandler";
 import { stopwatchProps, defaultStopwatchData } from '../../dataTypes';
 
+function differenceBetween(currentLoopCounter : number, lastLoopCounter : number) : string {
+    if (lastLoopCounter !== undefined) {
+        return `| ${generateDigitalWatchString(currentLoopCounter - lastLoopCounter)}`
+    } else {
+        return ""
+    }
+}
+
 function generateDigitalWatchString(counter : number) {
     var secsCounter = counter % 60
     var minsCounter = Math.floor(counter / 60).toFixed();
@@ -52,7 +60,7 @@ function Stopwatch(props : stopwatchProps) {
                 <button onClick={stopwatchEventHandler.resetCounter}>reset</button>
                 <button onClick={stopwatchEventHandler.loopWithCurrentCounter}>loop</button>
                 {loopTimes.map((looptime, index) => {
-                    return <p>#{index + 1} | {generateDigitalWatchString(looptime)}</p>
+                    return <p>#{index + 1} | {generateDigitalWatchString(looptime)} {differenceBetween(looptime, loopTimes[index-1])}</p>
                 })}
             </div>
         </div>
