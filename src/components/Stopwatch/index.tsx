@@ -35,8 +35,9 @@ function Stopwatch(props : stopwatchProps) {
         },
         resetCounter() {
             if (!runningState) {
+                stopwatchStorageHandler.moveCurrentAttributesToHistory(props.uuid)
                 setCounter(defaultStopwatchData.current.counter);
-                stopwatchStorageHandler.resetCounter(props.uuid);   
+                setLoopTimes([])
             }
         },
         loopWithCurrentCounter() {

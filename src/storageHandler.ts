@@ -87,6 +87,14 @@ const stopwatchStorageHandler = {
         let stopwatchData : stopwatchData = this.filterDataToObject(key)
         return stopwatchData.current.loops
     },
+
+    // Move running state to history
+    moveCurrentAttributesToHistory (key : string) {
+        let stopwatchData : stopwatchData = this.filterDataToObject(key)
+        stopwatchData.history.push(stopwatchData.current);
+        stopwatchData.current = defaultStopwatchData.current;
+        localStorage.setItem(key, JSON.stringify(stopwatchData));
+    },
 }
 
 export { stopwatchStorageHandler }
