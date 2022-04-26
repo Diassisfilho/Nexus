@@ -1,0 +1,11 @@
+.App {
+  text-align: center;
+}
+
+.StopwatchPainel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: fit-content;
+  margin: auto;
+}

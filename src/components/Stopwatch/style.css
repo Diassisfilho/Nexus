@@ -1,0 +1,9 @@
+.Stopwatch {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    margin: auto;
+    gap: 10px;
+}
