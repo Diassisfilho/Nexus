@@ -40,6 +40,16 @@ function Stopwatch(props : stopwatchProps) {
                 setLoopTimes([])
             }
         },
+        copyCurrentAttributesToClipboard() {
+            let digitalStopwatchPassed = generateDigitalWatchString(counter);
+            let formatedDigitalStopwatchLoops = loopTimes.map((looptime, index) => {
+                return `${(index==0) ? "" : ", "}#${index+1} - ${generateDigitalWatchString(looptime)}`
+            })
+
+            navigator.clipboard.writeText(
+                `Was passed ${digitalStopwatchPassed} and marked loops: ${formatedDigitalStopwatchLoops.join("")}.`
+            )
+        },
         loopWithCurrentCounter() {
             setLoopTimes([...loopTimes, counter])
             stopwatchStorageHandler.setLoopTimes(props.uuid, [...loopTimes, counter])
@@ -60,6 +70,7 @@ function Stopwatch(props : stopwatchProps) {
                 <button onClick={stopwatchEventHandler.startAndStopCounter}>start/stop</button>
                 <button onClick={stopwatchEventHandler.resetCounter}>reset</button>
                 <button onClick={stopwatchEventHandler.loopWithCurrentCounter}>loop</button>
+                <button onClick={stopwatchEventHandler.copyCurrentAttributesToClipboard}>copy to clipboard</button>
                 {loopTimes.map((looptime, index) => {
                     return <p>#{index + 1} | {generateDigitalWatchString(looptime)} {differenceBetween(looptime, loopTimes[index-1])}</p>
                 })}
