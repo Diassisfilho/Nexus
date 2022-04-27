@@ -25,8 +25,9 @@ function Stopwatch(props : stopwatchProps) {
     let startLoops = stopwatchStorageHandler.getLoopTimes(props.uuid);
 
     const [counter, setCounter] = useState<number>(startCounter);
-    const [runningState, setRuningState] = useState<boolean>(false);
     const [loopTimes, setLoopTimes] = useState<number[]>(startLoops);
+
+    const [runningState, setRuningState] = useState<boolean>(false);
 
     const stopwatchEventHandler = {
         startAndStopCounter() {
@@ -57,6 +58,11 @@ function Stopwatch(props : stopwatchProps) {
         executeCurrentState() {
             if (runningState) {
                 setTimeout(() => setCounter(counter + 1), 100);
+            } else {
+                setTimeout(() => {
+                    setCounter(stopwatchStorageHandler.getCounter(props.uuid));
+                    setLoopTimes(stopwatchStorageHandler.getLoopTimes(props.uuid));
+                }, 50);
             }
         }
     }
@@ -67,10 +73,14 @@ function Stopwatch(props : stopwatchProps) {
         <div>
             <div className="Stopwatch">
                 <span>{generateDigitalWatchString(counter)}</span>
+
                 <button onClick={stopwatchEventHandler.startAndStopCounter}>start/stop</button>
                 <button onClick={stopwatchEventHandler.resetCounter}>reset</button>
                 <button onClick={stopwatchEventHandler.loopWithCurrentCounter}>loop</button>
                 <button onClick={stopwatchEventHandler.copyCurrentAttributesToClipboard}>copy to clipboard</button>
+
+                <p>{props.uuid.split("-")[0]}</p>
+
                 {loopTimes.map((looptime, index) => {
                     return <p>#{index + 1} | {generateDigitalWatchString(looptime)} {differenceBetween(looptime, loopTimes[index-1])}</p>
                 })}

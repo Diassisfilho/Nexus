@@ -1,5 +1,4 @@
 export type stopwatchCurrentData = {
-    position : number,
     counter : number,
     loops : number[]
 }
@@ -11,12 +10,15 @@ export type stopwatchData = {
 
 export const defaultStopwatchData : stopwatchData = {
     current : {
-        position : 0,
         counter : 0,
         loops : []
     },
     history : []
 }
+
+export type stopwatchMainKeyData = [string, stopwatchData]
+
+export const defaultStopwatchMainKeyData = ["", defaultStopwatchData]
 
 export type stopwatchProps = {
     uuid : string

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as uuid from "uuid";
 
 import { Stopwatch } from './components/Stopwatch';
@@ -19,7 +19,14 @@ function App() {
     restoreUUIDs () {
       let oldUUID = stopwatchStorageHandler.getAllUUIDs()
       setStopwatchsUUIDs([...oldUUID])
-    }
+    },
+    deleteUUID (event : React.MouseEvent) {
+      let uuid = event.currentTarget.attributes[0].nodeValue
+      uuid = uuid !== null? uuid : ""
+
+      stopwatchStorageHandler.deleteStopwatchesData(uuid)
+      setStopwatchsUUIDs(stopwatchsUUIDs.filter((value) => value !== uuid))
+    },
   }
 
   if (!restore) {
@@ -33,9 +40,14 @@ function App() {
       <div>
         <div className="StopwatchPainel">
           <button onClick={stopwatchPainel.createAndSetUUID}>create stopwatch</button>
-            {stopwatchsUUIDs.map((uuid, index) => {
-              return <Stopwatch key={index} uuid={uuid}/>
-            })}
+          {stopwatchsUUIDs.map((uuid, index) => {
+            return (
+              <div>
+                <Stopwatch key={index} uuid={uuid}/>
+                <button id={uuid} key={-index+1} onClick={stopwatchPainel.deleteUUID}>delete</button>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
