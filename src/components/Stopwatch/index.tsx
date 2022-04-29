@@ -3,22 +3,7 @@ import './style.css'
 
 import { stopwatchStorageHandler } from "../../storageHandler";
 import { stopwatchProps, defaultStopwatchData } from '../../dataTypes';
-
-function differenceBetween(currentLoopCounter : number, lastLoopCounter : number) : string {
-    if (lastLoopCounter !== undefined) {
-        return `| ${generateDigitalWatchString(currentLoopCounter - lastLoopCounter)}`
-    } else {
-        return ""
-    }
-}
-
-function generateDigitalWatchString(counter : number) {
-    var secsCounter = counter % 60
-    var minsCounter = Math.floor(counter / 60).toFixed();
-    var hourCounter = Math.floor(counter / 3600).toFixed();
-
-    return `${hourCounter}:${minsCounter}:${secsCounter}`
-}
+import { differenceBetween, generateDigitalWatchString } from '../../utils';
 
 function Stopwatch(props : stopwatchProps) {
     let startCounter = stopwatchStorageHandler.getCounter(props.uuid);
@@ -57,7 +42,7 @@ function Stopwatch(props : stopwatchProps) {
         },
         executeCurrentState() {
             if (runningState) {
-                setTimeout(() => setCounter(counter + 1), 100);
+                setTimeout(() => setCounter(counter + 0.01), 10);
             } else {
                 setTimeout(() => {
                     setCounter(stopwatchStorageHandler.getCounter(props.uuid));

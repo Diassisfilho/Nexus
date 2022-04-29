@@ -10,7 +10,7 @@ export type stopwatchData = {
 
 export const defaultStopwatchData : stopwatchData = {
     current : {
-        counter : 0,
+        counter : 0.0,
         loops : []
     },
     history : []
