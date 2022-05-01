@@ -42,7 +42,10 @@ function Stopwatch(props : stopwatchProps) {
         },
         executeCurrentState() {
             if (runningState) {
-                setTimeout(() => setCounter(counter + 0.01), 10);
+                let newCounter = parseFloat( (counter + 0.01).toFixed(2) );
+                setTimeout(() => {
+                    setCounter(newCounter);
+                }, 10);
             } else {
                 setTimeout(() => {
                     setCounter(stopwatchStorageHandler.getCounter(props.uuid));
