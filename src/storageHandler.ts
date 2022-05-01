@@ -2,7 +2,6 @@ import {
     stopwatchData,
     defaultStopwatchData,
     stopwatchMainKeyData,
-    defaultStopwatchMainKeyData 
 } from "./dataTypes";
 
 const stopwatchMainKeyString = "stopwatchData";
@@ -109,6 +108,42 @@ const stopwatchStorageHandler = {
     },
 
     // Manipulate Stopwatch Attributes
+    // Timestamp
+    setTimestamp (key : string, newTimestamp : number) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.lastInteractionTimestamp = newTimestamp;
+        this.set(key, stopwatchData);
+    },
+
+    getTimestamp(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchData.current.lastInteractionTimestamp
+    },
+
+    resetTimestamp(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.lastInteractionTimestamp = defaultStopwatchData.current.lastInteractionTimestamp;
+        this.set(key, stopwatchData)
+    },
+
+    // Running state
+    setRunningstate (key : string, newRunningstate : boolean) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.runningState = newRunningstate;
+        this.set(key, stopwatchData);
+    },
+
+    getRunningstate(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchData.current.runningState
+    },
+
+    resetRunningstate(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.runningState = defaultStopwatchData.current.runningState;
+        this.set(key, stopwatchData)
+    },
+
     // Counter
     setCounter (key : string, newCounter : number) {
         let [stopwatchData, stopwatchExist] = this.get(key);
