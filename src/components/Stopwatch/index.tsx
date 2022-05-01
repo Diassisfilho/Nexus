@@ -9,6 +9,7 @@ function Stopwatch(props : stopwatchProps) {
     let startCounter = stopwatchStorageHandler.getCounter(props.uuid);
     let startLoops = stopwatchStorageHandler.getLoopTimes(props.uuid);
 
+    const [deletedUUID, setDeletedUUID] = useState<boolean>(false);
     const [counter, setCounter] = useState<number>(startCounter);
     const [loopTimes, setLoopTimes] = useState<number[]>(startLoops);
 
@@ -43,10 +44,24 @@ function Stopwatch(props : stopwatchProps) {
         executeCurrentState() {
             if (runningState) {
                 let newCounter = parseFloat( (counter + 0.01).toFixed(2) );
+
                 setTimeout(() => {
                     setCounter(newCounter);
                 }, 10);
+
+                setTimeout(() => {
+                    if (!stopwatchStorageHandler.exist(props.uuid)) {
+                        setRuningState(false)
+                        setDeletedUUID(true)
+                    }
+                }, 50)
             } else {
+                if (deletedUUID) {
+                    setCounter(stopwatchStorageHandler.getCounter(props.uuid));
+                    setLoopTimes(stopwatchStorageHandler.getLoopTimes(props.uuid));
+                    setDeletedUUID(false)
+                }
+
                 setTimeout(() => {
                     setCounter(stopwatchStorageHandler.getCounter(props.uuid));
                     setLoopTimes(stopwatchStorageHandler.getLoopTimes(props.uuid));

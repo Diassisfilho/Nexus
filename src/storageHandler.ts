@@ -41,25 +41,33 @@ const stopwatchStorageHandler = {
         localStorage.setItem(stopwatchMainKeyString, JSON.stringify(stopwatchKeyValue))
     },
 
-    get (key : string) : stopwatchData {
+    get (key : string) : [stopwatchData, boolean] {
         this.initialize()
 
         let stopwatchMainData : stopwatchMainKeyData[];
         let stopwatchMainKeyData : stopwatchData = defaultStopwatchData;
         let stopwatchStringData = localStorage.getItem(stopwatchMainKeyString);
+        let stopwatchExist = false;
 
         if (stopwatchStringData !== null) {
             stopwatchMainData = JSON.parse(stopwatchStringData)
             stopwatchMainData.forEach((stopwatch) => {
                 if (stopwatch[0] === key) {
                     stopwatchMainKeyData = stopwatch[1]
+                    stopwatchExist = true;
                 }
             })
         } else {
+            stopwatchExist = false;
             console.log("Null key found")
         }
 
-        return stopwatchMainKeyData
+        return [stopwatchMainKeyData, stopwatchExist]
+    },
+
+    exist(key : string) : boolean {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchExist
     },
 
     delete (key : string) {
@@ -103,37 +111,37 @@ const stopwatchStorageHandler = {
     // Manipulate Stopwatch Attributes
     // Counter
     setCounter (key : string, newCounter : number) {
-        let stopwatchData : stopwatchData = this.get(key);
+        let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.counter = newCounter;
         this.set(key, stopwatchData);
     },
 
     getCounter (key : string) {
-        let stopwatchData : stopwatchData = this.get(key);
+        let [stopwatchData, stopwatchExist] = this.get(key);
         return stopwatchData.current.counter;
     },
 
     resetCounter (key : string) {
-        let stopwatchData : stopwatchData = this.get(key);
+        let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.counter = defaultStopwatchData.current.counter;
         this.set(key, stopwatchData);
     },
 
     // Loop Times
     setLoopTimes (key : string, newLoopTimes : number[]) {
-        let stopwatchData : stopwatchData = this.get(key);
+        let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.loops = newLoopTimes;
         this.set(key, stopwatchData);
     },
 
     getLoopTimes (key : string) {
-        let stopwatchData : stopwatchData = this.get(key)
+        let [stopwatchData, stopwatchExist] = this.get(key);
         return stopwatchData.current.loops
     },
 
     // Move running state to history
     moveCurrentAttributesToHistory (key : string) {
-        let stopwatchData : stopwatchData = this.get(key)
+        let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.history.push(stopwatchData.current);
         stopwatchData.current = defaultStopwatchData.current;
         this.set(key, stopwatchData);
