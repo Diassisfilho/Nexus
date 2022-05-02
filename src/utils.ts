@@ -3,27 +3,19 @@ export function differenceBetween(currentLoopCounter : number, lastLoopCounter :
 }
 
 export function generateDigitalWatchString(counter : number) : string {
-    function filtringPadAndFloatPointsErrorsToSecsCounter(counter : number) : string {
-        var toReturn : string;
-        const counterString = String(counter);
+    var msecCounter, secsCounter, minsCounter, hourCounter;
+    var counterInSeconds = Math.floor(counter / 1000)
 
-        let [secLeftDigitsString, secRightDigitsString] = counterString.split(".");
-        let [secLeftDigitsNumber, secRightDigitsNumber] = [parseFloat(secLeftDigitsString) % 3600 % 60, parseFloat(secRightDigitsString)];
-        let [secLeftDigitsStringFormated, secRightDigitsStringFormated] = [String(secLeftDigitsNumber).padStart(2,"0"), String(secRightDigitsNumber).padEnd(2, "0")];
+    msecCounter = (counter - (counterInSeconds * 1000)) / 10; // Miliseconds
+    secsCounter = counterInSeconds % 60;
+    minsCounter = counterInSeconds % 3600 / 60;
+    hourCounter = counterInSeconds / 3600;
+
+    // Fix float numbers to integers and turn into strings
+    [ msecCounter, secsCounter, minsCounter, hourCounter ] = [msecCounter, secsCounter, minsCounter, hourCounter].map((value) => {
+        // The msecCounter and secsCounter not need Math.floor and toFixed methods, it's just to clean the code.
+        return Math.floor(value).toFixed().padStart(2, "0");
+    })
     
-        if (counterString.includes(".")) {
-            toReturn = (secLeftDigitsStringFormated + "." + secRightDigitsStringFormated).slice(0,5);
-        } else {
-            toReturn = secLeftDigitsStringFormated + "." + "00";
-        }
-
-        return toReturn
-    }
-    var secsCounter, minsCounter, hourCounter;
-
-    secsCounter = filtringPadAndFloatPointsErrorsToSecsCounter(counter)
-    minsCounter = Math.floor(counter % 3600 / 60).toFixed().padStart(2, "0");
-    hourCounter = Math.floor( counter / 3600 ).toFixed().padStart(2, "0");
-    
-    return `${hourCounter}:${minsCounter}:${secsCounter}`;
+    return `${hourCounter}:${minsCounter}:${secsCounter},${msecCounter}`;
 }

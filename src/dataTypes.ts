@@ -1,6 +1,11 @@
 export type stopwatchCurrentData = {
+    createdTimestamp: number,
     lastInteractionTimestamp : number,
+
     runningState : boolean,
+
+    name: string,
+    initialCounter : number,
     counter : number,
     loops : number[]
 }
@@ -12,8 +17,13 @@ export type stopwatchData = {
 
 export const defaultStopwatchData : stopwatchData = {
     current : {
+        createdTimestamp : 0,
         lastInteractionTimestamp : 0,
+
         runningState : false,
+
+        name: "Default",
+        initialCounter : 0.0,
         counter : 0.0,
         loops : []
     },

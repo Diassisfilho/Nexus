@@ -62,10 +62,8 @@ function Stopwatch(props : stopwatchProps) {
         },
         executeCurrentState() {
             if (runningState) {
-                let newCounter = parseFloat( (counter + 0.01).toFixed(2) );
-
                 setTimeout(() => {
-                    setCounter(newCounter);
+                    setCounter(counter + 10);
                 }, 10);
 
                 setTimeout(() => {

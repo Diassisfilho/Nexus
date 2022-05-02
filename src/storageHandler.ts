@@ -2,6 +2,7 @@ import {
     stopwatchData,
     defaultStopwatchData,
     stopwatchMainKeyData,
+    stopwatchCurrentData,
 } from "./dataTypes";
 
 const stopwatchMainKeyString = "stopwatchData";
@@ -84,8 +85,11 @@ const stopwatchStorageHandler = {
     },
 
     // Manipulate Stopwatch
-    createStopwatchData (key : string) {
-        this.set(key, defaultStopwatchData)
+    createStopwatchData (key : string, newDefaultCurrentContent?: stopwatchCurrentData) {
+        let modifiedDefaultStopwatchData = defaultStopwatchData;
+        modifiedDefaultStopwatchData.current = (newDefaultCurrentContent !== undefined)? newDefaultCurrentContent : defaultStopwatchData.current;
+        modifiedDefaultStopwatchData.current.createdTimestamp = new Date().getTime();
+        this.set(key, modifiedDefaultStopwatchData);
     },
 
     deleteStopwatchesData (key : string) {
@@ -108,7 +112,7 @@ const stopwatchStorageHandler = {
     },
 
     // Manipulate Stopwatch Attributes
-    // Timestamp
+    // Last Interaction Timestamp
     setTimestamp (key : string, newTimestamp : number) {
         let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.lastInteractionTimestamp = newTimestamp;
@@ -124,6 +128,36 @@ const stopwatchStorageHandler = {
         let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.lastInteractionTimestamp = defaultStopwatchData.current.lastInteractionTimestamp;
         this.set(key, stopwatchData)
+    },
+    
+    // Created Timestamp
+    getCreatedTimestamp(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchData.current.createdTimestamp
+    },
+
+    // Name
+    setName(key : string, newName : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.name = newName;
+        this.set(key, stopwatchData);
+    },
+
+    getName(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchData.current.name
+    },
+
+    resetName(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.current.name = defaultStopwatchData.current.name;
+        this.set(key, stopwatchData)
+    },
+
+    // Initial counter
+    getInitialCounter(key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        return stopwatchData.current.initialCounter
     },
 
     // Running state
