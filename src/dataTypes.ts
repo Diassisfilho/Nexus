@@ -6,7 +6,7 @@ export type stopwatchCurrentData = {
 
     name: string,
     initialCounter : number,
-    counter : number,
+    overAllCounter : number,
     loops : number[]
 }
 
@@ -23,8 +23,8 @@ export const defaultStopwatchData : stopwatchData = {
         runningState : false,
 
         name: "Default",
-        initialCounter : 0.0,
-        counter : 0.0,
+        initialCounter : 0,
+        overAllCounter : 0,
         loops : []
     },
     history : []

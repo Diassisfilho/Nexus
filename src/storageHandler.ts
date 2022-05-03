@@ -113,18 +113,18 @@ const stopwatchStorageHandler = {
 
     // Manipulate Stopwatch Attributes
     // Last Interaction Timestamp
-    setTimestamp (key : string, newTimestamp : number) {
+    setLastInteractionTimestamp (key : string, newTimestamp : number) {
         let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.lastInteractionTimestamp = newTimestamp;
         this.set(key, stopwatchData);
     },
 
-    getTimestamp(key : string) {
+    getLastInteractionTimestamp(key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
         return stopwatchData.current.lastInteractionTimestamp
     },
 
-    resetTimestamp(key : string) {
+    resetLastInteractionTimestamp(key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
         stopwatchData.current.lastInteractionTimestamp = defaultStopwatchData.current.lastInteractionTimestamp;
         this.set(key, stopwatchData)
@@ -179,20 +179,20 @@ const stopwatchStorageHandler = {
     },
 
     // Counter
-    setCounter (key : string, newCounter : number) {
+    setOverAllCounter (key : string, newOverAllCounter : number) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        stopwatchData.current.counter = newCounter;
+        stopwatchData.current.overAllCounter = newOverAllCounter;
         this.set(key, stopwatchData);
     },
 
-    getCounter (key : string) {
+    getOverAllCounter (key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        return stopwatchData.current.counter;
+        return stopwatchData.current.overAllCounter;
     },
 
-    resetCounter (key : string) {
+    resetOverAllCounter (key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        stopwatchData.current.counter = defaultStopwatchData.current.counter;
+        stopwatchData.current.overAllCounter = defaultStopwatchData.current.overAllCounter;
         this.set(key, stopwatchData);
     },
 
