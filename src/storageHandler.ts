@@ -154,12 +154,6 @@ const stopwatchStorageHandler = {
         this.set(key, stopwatchData)
     },
 
-    // Initial counter
-    getInitialCounter(key : string) {
-        let [stopwatchData, stopwatchExist] = this.get(key);
-        return stopwatchData.current.initialCounter
-    },
-
     // Running state
     setRunningstate (key : string, newRunningstate : boolean) {
         let [stopwatchData, stopwatchExist] = this.get(key);
@@ -179,20 +173,20 @@ const stopwatchStorageHandler = {
     },
 
     // Counter
-    setOverAllCounter (key : string, newOverAllCounter : number) {
+    setTotalTime (key : string, newTotalTime : number) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        stopwatchData.current.overAllCounter = newOverAllCounter;
+        stopwatchData.current.totalTime = newTotalTime;
         this.set(key, stopwatchData);
     },
 
-    getOverAllCounter (key : string) {
+    getTotalTime (key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        return stopwatchData.current.overAllCounter;
+        return stopwatchData.current.totalTime;
     },
 
-    resetOverAllCounter (key : string) {
+    resetTotalTime (key : string) {
         let [stopwatchData, stopwatchExist] = this.get(key);
-        stopwatchData.current.overAllCounter = defaultStopwatchData.current.overAllCounter;
+        stopwatchData.current.totalTime = defaultStopwatchData.current.totalTime;
         this.set(key, stopwatchData);
     },
 

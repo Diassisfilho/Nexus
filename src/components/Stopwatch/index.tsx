@@ -5,114 +5,129 @@ import { stopwatchStorageHandler as storageHandler} from "../../storageHandler";
 import { stopwatchProps, defaultStopwatchData } from '../../dataTypes';
 import { differenceBetween, generateDigitalWatchString } from '../../utils';
 
-function defineCounterBasedOnStates(startCounter : number, startRunningState : boolean, startTimeStamp : number) : number {
-    let toReturn : number = startCounter;
-    if (startRunningState) {
-        let currentTimestamp = new Date().getTime();
-        toReturn = (currentTimestamp - startTimeStamp) + startCounter;
-    }
-    return toReturn;
-}
-
-function definingStopwatchAttributesFromLocalstorage(uuid : string) : [number, number[], boolean, number] {
-    const lastInteractionTimeStamp = storageHandler.getLastInteractionTimestamp(uuid);
-    const loops = storageHandler.getLoopTimes(uuid);
+function stopwatchAttributesFromStorage(uuid : string) : [number, number[], boolean, number] {
     const runningState = storageHandler.getRunningstate(uuid);
+    const loops = storageHandler.getLoopTimes(uuid);
+    const lastInteractionTimeStamp = storageHandler.getLastInteractionTimestamp(uuid);
 
-    const oldCounter = storageHandler.getOverAllCounter(uuid);
-    const counter = defineCounterBasedOnStates(oldCounter, runningState, lastInteractionTimeStamp);
+    const lastTotalTime = storageHandler.getTotalTime(uuid);
+    const totalTime = (runningState)? (Date.now() - lastInteractionTimeStamp) + lastTotalTime: lastTotalTime;
 
-    return [lastInteractionTimeStamp, loops, runningState, counter]
+    return [lastInteractionTimeStamp, loops, runningState, totalTime]
 }
 
 function Stopwatch(props : stopwatchProps) {
-    const [startLastInteractionTimeStamp, startLoops, startRunningState, startCounter] = definingStopwatchAttributesFromLocalstorage(props.uuid);
+    const [startLastInteractionTimeStamp, startLoops, startRunningState, startTotalTime] = stopwatchAttributesFromStorage(props.uuid);
 
-    // Setting react attributes states
-    const [deletedUUID, setDeletedUUID] = useState<boolean>(false);
-
+    // Setting stopwatch attributes states
     const [lastInteractionTimestamp, setLastInteractionTimestamp] = useState<number>(startLastInteractionTimeStamp);
-    const [overAllCounter, setOverAllCounter] = useState<number>(startCounter);
-    const [counter, setCounter] = useState<number>(startCounter);
+    const [totalTime, setTotalTime] = useState<number>(startTotalTime);
+    const [runningState, setRuningState] = useState<boolean>(startRunningState);
     const [loopTimes, setLoopTimes] = useState<number[]>(startLoops);
 
-    const [runningState, setRuningState] = useState<boolean>(startRunningState);
+    const time = {
+        getTimeElapsedSinceLastInteraction() {
+            return Date.now() - lastInteractionTimestamp;
+        },
+        getTime() {
+            return totalTime + this.getTimeElapsedSinceLastInteraction()
+        }
+    }
+
+    // Setting stopwatch utilities
+    const [temporaryCounter, setTemporaryCounter] = useState<number>(totalTime);
+    const [updatedAttributes, setUpdatedAttributes] = useState<boolean>(false);
+    const [deletedUUID, setDeletedUUID] = useState<boolean>(false);
 
     const eventHandler = {
         startAndStopCounter() {
-            let currentTimestamp = new Date().getTime();
-            setLastInteractionTimestamp(currentTimestamp);
-            storageHandler.setLastInteractionTimestamp(props.uuid, currentTimestamp);
+            if (runningState) {
+                setTotalTime(time.getTime());
+                storageHandler.setTotalTime(props.uuid, time.getTime());
+            }
+            if (!runningState) {
+                let currentTimestamp = Date.now();
+                setLastInteractionTimestamp(currentTimestamp);
+                storageHandler.setLastInteractionTimestamp(props.uuid, currentTimestamp);
+            }
 
             setRuningState(!runningState);
-            storageHandler.setRunningstate(props.uuid, !runningState)
-
-            setCounter((!runningState)? counter + this.time.getTimeElapsedSinceLastInteraction(): overAllCounter)
-            storageHandler.setOverAllCounter(props.uuid, overAllCounter)
+            storageHandler.setRunningstate(props.uuid, !runningState);
         },
-        resetCounter() {
+
+        resetCurrentData() {
             if (!runningState) {
                 storageHandler.moveCurrentAttributesToHistory(props.uuid)
-                setOverAllCounter(defaultStopwatchData.current.initialCounter);
-                setCounter(defaultStopwatchData.current.initialCounter);
-                setLoopTimes([]);
+
                 setLastInteractionTimestamp(defaultStopwatchData.current.lastInteractionTimestamp);
+                setTotalTime(defaultStopwatchData.current.totalTime);
+                setRuningState(defaultStopwatchData.current.runningState);
+                setLoopTimes([]);
+
+                setTemporaryCounter(defaultStopwatchData.current.totalTime);
             }
         },
+
         loopWithCurrentCounter() {
-            setLoopTimes([...loopTimes, overAllCounter])
-            storageHandler.setLoopTimes(props.uuid, [...loopTimes, overAllCounter])
+            setLoopTimes([...loopTimes, temporaryCounter])
+            storageHandler.setLoopTimes(props.uuid, [...loopTimes, temporaryCounter])
         },
+
+        syncAttributesAndStorage() {
+            let [newLastInteractionTimestamp, newLoops, newRunningState, newTotalTime] = stopwatchAttributesFromStorage(props.uuid);
+            let currentTemporaryCounter = time.getTime();
+
+            setLastInteractionTimestamp(newLastInteractionTimestamp);
+            setLoopTimes(newLoops);
+            setRuningState(newRunningState);
+            setTotalTime(newTotalTime);
+
+            setTemporaryCounter(currentTemporaryCounter);
+        },
+
         executeCurrentState() {
+            setTimeout(() => {
+                if (!storageHandler.exist(props.uuid)) {
+                    setRuningState(false)
+                    setDeletedUUID(true)
+                }
+            }, 50)
+
             if (runningState) {
                 setTimeout(() => {
-                    setOverAllCounter(this.time.getTime());
+                    setTemporaryCounter(time.getTime());
                 }, 10);
+            }
 
-                setTimeout(() => {
-                    if (!storageHandler.exist(props.uuid)) {
-                        setRuningState(false)
-                        setDeletedUUID(true)
+            if (!runningState) {
+                if (!updatedAttributes) {
+                    if (lastInteractionTimestamp > Date.now()) {
+                        this.syncAttributesAndStorage();
                     }
-                }, 50)
-
-            } else {
+                    setUpdatedAttributes(true);
+                }
                 if (deletedUUID) {
-                    let [currentTimeStamp, currentLoops, currentRunningState, currentCounter] = definingStopwatchAttributesFromLocalstorage(props.uuid);
-                    currentCounter = this.time.getTime();
-
-                    setOverAllCounter(currentCounter);
-                    setLoopTimes(currentLoops);
+                    this.syncAttributesAndStorage();
                     setDeletedUUID(false);
                     setRuningState(true);
                 }
-
-                setTimeout(() => {
-                    setOverAllCounter(storageHandler.getOverAllCounter(props.uuid));
-                    setLoopTimes(storageHandler.getLoopTimes(props.uuid));
-                }, 50);
             }
         },
+
         copyCurrentAttributesToClipboard() {
-            let digitalStopwatchPassed = generateDigitalWatchString(overAllCounter);
+            let digitalStopwatchPassed = generateDigitalWatchString(temporaryCounter);
             let formatedDigitalStopwatchLoops = loopTimes.map((looptime, index) => {
-                return `${(index==0) ? "" : ", "}#${index+1} - ${generateDigitalWatchString(looptime)}`
+                let commaOrNot = (index === 0) ? "" : ",";
+                let loopNumber = index+1;
+                let digitalString = generateDigitalWatchString(looptime);
+
+                return `${commaOrNot} #${loopNumber} - ${digitalString}`
             })
 
             navigator.clipboard.writeText(
                 `Was passed ${digitalStopwatchPassed} and marked loops: ${formatedDigitalStopwatchLoops.join("")}.`
             )
         },
-        time : {
-            getTimeElapsedSinceLastInteraction() {
-                return lastInteractionTimestamp - storageHandler.getInitialCounter(props.uuid);
-            },
-            getTime() {
-                let currentTimestamp = new Date().getTime();
-                let timeElapsedSinceLastInteraction = this.getTimeElapsedSinceLastInteraction();
-                return (currentTimestamp - timeElapsedSinceLastInteraction) + counter
-            }
-        }
     }
     
     eventHandler.executeCurrentState()
@@ -120,10 +135,10 @@ function Stopwatch(props : stopwatchProps) {
     return (
         <div>
             <div className="Stopwatch">
-                <span>{generateDigitalWatchString(overAllCounter)}</span>
+                <span>{generateDigitalWatchString(temporaryCounter)}</span>
 
                 <button onClick={eventHandler.startAndStopCounter}>start/stop</button>
-                <button onClick={eventHandler.resetCounter}>reset</button>
+                <button onClick={eventHandler.resetCurrentData}>reset</button>
                 <button onClick={eventHandler.loopWithCurrentCounter}>loop</button>
                 <button onClick={eventHandler.copyCurrentAttributesToClipboard}>copy to clipboard</button>
 
