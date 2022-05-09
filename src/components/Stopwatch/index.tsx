@@ -10,8 +10,7 @@ function stopwatchAttributesFromStorage(uuid : string) : [number, number[], bool
     const loops = storageHandler.getLoopTimes(uuid);
     const lastInteractionTimeStamp = storageHandler.getLastInteractionTimestamp(uuid);
 
-    const lastTotalTime = storageHandler.getTotalTime(uuid);
-    const totalTime = (runningState)? (Date.now() - lastInteractionTimeStamp) + lastTotalTime: lastTotalTime;
+    const totalTime = storageHandler.getTotalTime(uuid);
 
     return [lastInteractionTimeStamp, loops, runningState, totalTime]
 }
@@ -30,12 +29,21 @@ function Stopwatch(props : stopwatchProps) {
             return Date.now() - lastInteractionTimestamp;
         },
         getTime() {
-            return totalTime + this.getTimeElapsedSinceLastInteraction()
+            if (!lastInteractionTimestamp) {
+                return 0;
+            }
+
+            if (runningState) {
+                return totalTime + this.getTimeElapsedSinceLastInteraction();
+            }
+            
+            return totalTime;
         }
     }
 
     // Setting stopwatch utilities
-    const [temporaryCounter, setTemporaryCounter] = useState<number>(totalTime);
+    const [temporaryCounter, setTemporaryCounter] = useState<number>(0);
+    const [restoredSession, setRestoredSession] = useState<boolean>(false);
     const [updatedAttributes, setUpdatedAttributes] = useState<boolean>(false);
     const [deletedUUID, setDeletedUUID] = useState<boolean>(false);
 
@@ -46,9 +54,8 @@ function Stopwatch(props : stopwatchProps) {
                 storageHandler.setTotalTime(props.uuid, time.getTime());
             }
             if (!runningState) {
-                let currentTimestamp = Date.now();
-                setLastInteractionTimestamp(currentTimestamp);
-                storageHandler.setLastInteractionTimestamp(props.uuid, currentTimestamp);
+                setLastInteractionTimestamp(Date.now());
+                storageHandler.setLastInteractionTimestamp(props.uuid, Date.now());
             }
 
             setRuningState(!runningState);
@@ -100,6 +107,11 @@ function Stopwatch(props : stopwatchProps) {
             }
 
             if (!runningState) {
+                if (!restoredSession) {
+                    setTemporaryCounter(totalTime);
+                    setRestoredSession(true);
+                }
+
                 if (!updatedAttributes) {
                     if (lastInteractionTimestamp > Date.now()) {
                         this.syncAttributesAndStorage();
