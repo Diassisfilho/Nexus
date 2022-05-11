@@ -17,5 +17,5 @@ export function generateDigitalWatchString(counter : number) : string {
         return Math.floor(value).toFixed().padStart(2, "0");
     })
     
-    return `${hourCounter}:${minsCounter}:${secsCounter},${msecCounter}`;
+    return `${hourCounter}:${minsCounter}:${secsCounter}.${msecCounter}`;
 }

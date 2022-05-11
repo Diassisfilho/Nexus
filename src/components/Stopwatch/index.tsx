@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './style.css'
 
 import { stopwatchStorageHandler as storageHandler} from "../../storageHandler";
@@ -9,7 +9,6 @@ function stopwatchAttributesFromStorage(uuid : string) : [number, number[], bool
     const runningState = storageHandler.getRunningstate(uuid);
     const loops = storageHandler.getLoopTimes(uuid);
     const lastInteractionTimeStamp = storageHandler.getLastInteractionTimestamp(uuid);
-
     const totalTime = storageHandler.getTotalTime(uuid);
 
     return [lastInteractionTimeStamp, loops, runningState, totalTime]
@@ -44,8 +43,6 @@ function Stopwatch(props : stopwatchProps) {
     // Setting stopwatch utilities
     const [temporaryCounter, setTemporaryCounter] = useState<number>(0);
     const [restoredSession, setRestoredSession] = useState<boolean>(false);
-    const [updatedAttributes, setUpdatedAttributes] = useState<boolean>(false);
-    const [deletedUUID, setDeletedUUID] = useState<boolean>(false);
 
     const eventHandler = {
         startAndStopCounter() {
@@ -82,48 +79,12 @@ function Stopwatch(props : stopwatchProps) {
 
         syncAttributesAndStorage() {
             let [newLastInteractionTimestamp, newLoops, newRunningState, newTotalTime] = stopwatchAttributesFromStorage(props.uuid);
-            let currentTemporaryCounter = time.getTime();
 
             setLastInteractionTimestamp(newLastInteractionTimestamp);
             setLoopTimes(newLoops);
             setRuningState(newRunningState);
             setTotalTime(newTotalTime);
-
-            setTemporaryCounter(currentTemporaryCounter);
-        },
-
-        executeCurrentState() {
-            setTimeout(() => {
-                if (!storageHandler.exist(props.uuid)) {
-                    setRuningState(false)
-                    setDeletedUUID(true)
-                }
-            }, 50)
-
-            if (runningState) {
-                setTimeout(() => {
-                    setTemporaryCounter(time.getTime());
-                }, 10);
-            }
-
-            if (!runningState) {
-                if (!restoredSession) {
-                    setTemporaryCounter(totalTime);
-                    setRestoredSession(true);
-                }
-
-                if (!updatedAttributes) {
-                    if (lastInteractionTimestamp > Date.now()) {
-                        this.syncAttributesAndStorage();
-                    }
-                    setUpdatedAttributes(true);
-                }
-                if (deletedUUID) {
-                    this.syncAttributesAndStorage();
-                    setDeletedUUID(false);
-                    setRuningState(true);
-                }
-            }
+            setTemporaryCounter(time.getTime());
         },
 
         copyCurrentAttributesToClipboard() {
@@ -141,8 +102,29 @@ function Stopwatch(props : stopwatchProps) {
             )
         },
     }
-    
-    eventHandler.executeCurrentState()
+
+    useEffect(() => {
+        if (runningState) {
+            setTimeout(() => {
+                setTemporaryCounter(time.getTime());
+            }, 10);
+        }
+    })
+
+    useEffect(() => {
+        if (!runningState) {
+            if (!restoredSession) {
+                setTemporaryCounter(totalTime);
+                setRestoredSession(true);
+            }
+
+            setTimeout(() => {
+                if (storageHandler.getTotalTime(props.uuid) !== totalTime) {
+                    eventHandler.syncAttributesAndStorage();
+                }
+            }, 10)
+        }
+    }, [props.uuid])
 
     return (
         <div>

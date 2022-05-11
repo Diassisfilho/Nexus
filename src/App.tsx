@@ -41,10 +41,11 @@ function App() {
         <div className="StopwatchPainel">
           <button onClick={stopwatchPainel.createAndSetUUID}>create stopwatch</button>
           {stopwatchsUUIDs.map((uuid, index) => {
+            let shortedUUID = uuid.split("-")
             return (
-              <div>
-                <Stopwatch key={index} uuid={uuid}/>
-                <button id={uuid} key={-index+1} onClick={stopwatchPainel.deleteUUID}>delete</button>
+              <div key={index}>
+                <Stopwatch key={shortedUUID[0]} uuid={uuid}/>
+                <button id={uuid} key={shortedUUID[1]} onClick={stopwatchPainel.deleteUUID}>delete</button>
               </div>
             )
           })}
