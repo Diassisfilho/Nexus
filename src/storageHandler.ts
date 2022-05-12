@@ -17,7 +17,7 @@ const stopwatchStorageHandler = {
         }
     },
 
-    // Basic methods to set, get and delete stopwatch content
+    // Basic methods to set, get, exist and delete stopwatch content
     set (key : string, value : stopwatchData) {
         this.initialize()
 
@@ -110,6 +110,14 @@ const stopwatchStorageHandler = {
 
         return allStorage
     },
+    
+    // Move running state to history
+    moveCurrentAttributesToHistory (key : string) {
+        let [stopwatchData, stopwatchExist] = this.get(key);
+        stopwatchData.history.push(stopwatchData.current);
+        stopwatchData.current = defaultStopwatchData.current;
+        this.set(key, stopwatchData);
+    },
 
     // Manipulate Stopwatch Attributes
     // Last Interaction Timestamp
@@ -201,14 +209,6 @@ const stopwatchStorageHandler = {
         let [stopwatchData, stopwatchExist] = this.get(key);
         return stopwatchData.current.loops
     },
-
-    // Move running state to history
-    moveCurrentAttributesToHistory (key : string) {
-        let [stopwatchData, stopwatchExist] = this.get(key);
-        stopwatchData.history.push(stopwatchData.current);
-        stopwatchData.current = defaultStopwatchData.current;
-        this.set(key, stopwatchData);
-    },
 }
 
-export { stopwatchStorageHandler }
+export { stopwatchStorageHandler, stopwatchMainKeyString }

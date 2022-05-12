@@ -109,7 +109,7 @@ export default {
   // reporters: undefined,
 
   // Automatically reset mock state before every test
-  // resetMocks: false,
+   resetMocks: false,
 
   // Reset the module registry before running each individual test
   // resetModules: false,
@@ -132,7 +132,7 @@ export default {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [],
+  setupFiles: ["jest-localstorage-mock"],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
@@ -185,7 +185,7 @@ export default {
   // unmockedModulePathPatterns: undefined,
 
   // Indicates whether each individual test should be reported during the run
-  // verbose: undefined,
+  verbose: true,
 
   // An array of regexp patterns that are matched against all source file paths before re-running tests in watch mode
   // watchPathIgnorePatterns: [],
