@@ -1,4 +1,4 @@
-import { generateDigitalWatchString } from "../../src/utils";
+import { generateDigitalWatchString } from "../../utils";
 
 describe("Basic tests on function generateDigitalWatchString", () => {
     it("seconds", () => {

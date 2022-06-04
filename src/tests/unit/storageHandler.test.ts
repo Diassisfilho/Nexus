@@ -1,8 +1,8 @@
 import {
     defaultStopwatchData
-} from "../../src/dataTypes";
+} from "../../dataTypes";
 
-import { stopwatchStorageHandler, stopwatchMainKeyString} from "../../src/storageHandler";
+import { stopwatchStorageHandler, stopwatchMainKeyString} from "../../storageHandler";
 import * as uuid from "uuid";
 
 describe("Basic methods", () => {
@@ -40,9 +40,10 @@ describe("Basic methods", () => {
         defaultStopwatchData.current.name = "Modified"
         stopwatchStorageHandler.set(randomUUID, defaultStopwatchData)
 
+        const stopwatchDataString = localStorage.getItem("stopwatchData")
         
         const operation = JSON.stringify(
-            JSON.parse(localStorage.getItem("stopwatchData"))[0]
+            JSON.parse(stopwatchDataString ? stopwatchDataString : "")[0]
         )
         const result = JSON.stringify([randomUUID, defaultStopwatchData]);
 
@@ -153,7 +154,7 @@ afterEach(() => {
 })
 
 test("getAllUUIDs", () => {
-    const randomUUIDs = Array(20).map(() => uuid.v1());
+    const randomUUIDs = [...Array(20)].map(() => uuid.v1());
     randomUUIDs.forEach((randomUUID) => stopwatchStorageHandler.createStopwatchData(randomUUID));
 
     const allUUIDs = stopwatchStorageHandler.getAllUUIDs();
